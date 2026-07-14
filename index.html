@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>教學醫院課程雷達</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #121c30;
+    --line: #223256;
+    --text: #e7ecf7;
+    --muted: #8fa0c4;
+    --accent: #35e0a1;
+    --accent-dim: #1d8f68;
+    --mono: "SFMono-Regular", Consolas, "Noto Sans Mono TC", monospace;
+    --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(circle at 50% -10%, #14213c 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+  }
+  header {
+    padding: 40px 24px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .radar {
+    width: 64px; height: 64px; margin: 0 auto 14px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    position: relative;
+    background:
+      repeating-radial-gradient(circle, transparent 0 10px, var(--line) 10px 11px);
+  }
+  .radar::after {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--accent) 0deg, transparent 55deg, transparent 360deg);
+    animation: sweep 3.2s linear infinite;
+    opacity: 0.85;
+  }
+  @keyframes sweep { to { transform: rotate(360deg); } }
+  h1 {
+    font-size: clamp(22px, 4vw, 32px);
+    letter-spacing: 0.02em;
+    margin: 0 0 6px;
+  }
+  header p { color: var(--muted); margin: 0; font-size: 14px; }
+
+  .controls {
+    max-width: 900px;
+    margin: 0 auto 18px;
+    padding: 0 24px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .controls input, .controls select {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: var(--sans);
+  }
+  .controls input { flex: 1 1 240px; }
+  .controls select { flex: 0 0 auto; }
+  .controls input:focus, .controls select:focus {
+    outline: none; border-color: var(--accent);
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+  .stat {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    margin: 0 0 14px;
+  }
+  ul.list { list-style: none; margin: 0; padding: 0; }
+  li.item {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  li.item a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  li.item a:hover { color: var(--accent); text-decoration: underline; }
+  .meta {
+    flex: 0 0 auto;
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-left: 10px;
+  }
+  .source-tag {
+    display: inline-block;
+    color: var(--accent);
+    margin-bottom: 3px;
+  }
+  .new-badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: #d8fff0;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 60px 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .reflection-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border: 1px solid var(--accent-dim);
+    color: var(--accent);
+    border-radius: 6px;
+    font-size: 12px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .reflection-btn:hover {
+    background: var(--accent-dim);
+    color: #d8fff0;
+  }
+  .approved-badge {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 10px;
+    background: rgba(53, 224, 161, 0.12);
+    border: 1px solid var(--accent-dim);
+    color: var(--accent);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 20px 24px 40px;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="radar"></div>
+    <h1>教學醫院課程雷達</h1>
+    <p>自動掃描各教學醫院／學會公告頁，彙整最新課程與工作坊</p>
+  </header>
+
+  <div class="controls">
+    <input id="search" type="text" placeholder="搜尋課程名稱…" />
+    <select id="sourceFilter">
+      <option value="">全部來源</option>
+    </select>
+  </div>
+
+  <main>
+    <p class="stat" id="stat"></p>
+    <ul class="list" id="list"></ul>
+    <div class="empty" id="empty" style="display:none">
+      尚未抓到任何課程資料。<br />
+      請確認 GitHub Actions 是否已成功執行過一次（Actions 分頁 → Scrape Courses → Run workflow）。
+    </div>
+  </main>
+
+  <footer>
+    資料自動彙整自各機構公開公告頁，僅顯示標題與連結並導回原站，非官方彙整，實際資訊以原公告為準。
+  </footer>
+
+<script>
+  const state = { data: [], search: "", source: "", reflectionConfig: null, approvedCounts: {} };
+
+  function needsReflection(item) {
+    const cfg = state.reflectionConfig;
+    if (!cfg) return false;
+    if (cfg.match_sources && cfg.match_sources.includes(item.source)) return true;
+    if (cfg.match_keywords) {
+      const title = item.title.toLowerCase();
+      return cfg.match_keywords.some(k => title.includes(k.toLowerCase()));
+    }
+    return false;
+  }
+
+  // 如果有設定 course_name_entry_id，就把課程標題預先帶入表單的「課程名稱」欄位，
+  // 這樣學員填的課程名稱會跟網站上的標題完全一致，之後「已認列人數」才對得起來
+  function buildFormUrl(item) {
+    const cfg = state.reflectionConfig;
+    if (!cfg || !cfg.form_url) return "";
+    if (!cfg.course_name_entry_id) return cfg.form_url;
+    const sep = cfg.form_url.includes("?") ? "&" : "?";
+    return `${cfg.form_url}${sep}usp=pp_url&entry.${cfg.course_name_entry_id}=${encodeURIComponent(item.title)}`;
+  }
+
+  function daysAgo(iso) {
+    const then = new Date(iso).getTime();
+    const now = Date.now();
+    return Math.floor((now - then) / 86400000);
+  }
+
+  function render() {
+    const list = document.getElementById("list");
+    const empty = document.getElementById("empty");
+    const stat = document.getElementById("stat");
+
+    let items = state.data;
+    if (state.source) items = items.filter(it => it.source === state.source);
+    if (state.search) {
+      const q = state.search.toLowerCase();
+      items = items.filter(it => it.title.toLowerCase().includes(q));
+    }
+
+    stat.textContent = `共 ${state.data.length} 筆課程・目前顯示 ${items.length} 筆`;
+
+    list.innerHTML = "";
+    if (items.length === 0) {
+      empty.style.display = "block";
+      empty.innerHTML = state.data.length === 0
+        ? "尚未抓到任何課程資料。<br />請確認 GitHub Actions 是否已成功執行過一次。"
+        : "沒有符合篩選條件的課程。";
+      return;
+    }
+    empty.style.display = "none";
+
+    for (const it of items) {
+      const li = document.createElement("li");
+      li.className = "item";
+      const age = daysAgo(it.first_seen);
+      const badge = age <= 3 ? '<span class="new-badge">NEW</span>' : "";
+      let reflectionLink = "";
+      if (needsReflection(it)) {
+        const url = buildFormUrl(it);
+        if (url) {
+          reflectionLink = `<br /><a class="reflection-btn" href="${url}" target="_blank" rel="noopener">📝 無法自動核發證明，上完課請填心得申請學分</a>`;
+        }
+        const approved = state.approvedCounts[it.title];
+        if (approved) {
+          reflectionLink += `<br /><span class="approved-badge">✅ 已有 ${approved} 人送出心得，學分認列中</span>`;
+        }
+      }
+      li.innerHTML = `
+        <div>
+          <span class="source-tag">${it.source}</span>${badge}<br />
+          <a href="${it.url}" target="_blank" rel="noopener">${it.title}</a>
+          ${reflectionLink}
+        </div>
+        <div class="meta">首次發現<br />${it.first_seen.slice(0, 10)}</div>
+      `;
+      list.appendChild(li);
+    }
+  }
+
+  function populateSources() {
+    const sel = document.getElementById("sourceFilter");
+    const names = [...new Set(state.data.map(it => it.source))].sort();
+    for (const name of names) {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      sel.appendChild(opt);
+    }
+  }
+
+  document.getElementById("search").addEventListener("input", e => {
+    state.search = e.target.value;
+    render();
+  });
+  document.getElementById("sourceFilter").addEventListener("change", e => {
+    state.source = e.target.value;
+    render();
+  });
+
+  Promise.all([
+    fetch("data/courses.json", { cache: "no-store" }).then(r => (r.ok ? r.json() : [])),
+    fetch("data/manual-courses.json", { cache: "no-store" }).then(r => (r.ok ? r.json() : [])),
+    fetch("reflection-required.json", { cache: "no-store" }).then(r => (r.ok ? r.json() : null)),
+  ])
+    .then(([autoData, manualData, reflectionConfig]) => {
+      const merged = [...autoData, ...manualData.map(it => ({ ...it, last_seen: it.last_seen || it.first_seen }))];
+      state.data = merged.sort((a, b) => (a.first_seen < b.first_seen ? 1 : -1));
+      state.reflectionConfig = reflectionConfig;
+      populateSources();
+
+      if (reflectionConfig && reflectionConfig.status_api_url) {
+        fetch(reflectionConfig.status_api_url, { cache: "no-store" })
+          .then(r => (r.ok ? r.json() : []))
+          .then(list => {
+            state.approvedCounts = {};
+            for (const it of list) state.approvedCounts[it.course] = it.approved_count;
+            render();
+          })
+          .catch(() => render());
+      } else {
+        render();
+      }
+    })
+    .catch(() => render());
+</script>
+</body>
+</html>
