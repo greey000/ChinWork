@@ -1,10 +1,5 @@
 [
   {
-    "name": "醫策會-師資培育課程公告",
-    "url": "https://www.jct.org.tw/cp-73-2907-b66fd-1.html",
-    "list_selector": "body"
-  },
-  {
     "name": "臺灣醫學教育學會-線上書院",
     "url": "http://elearning.tame.org.tw/?arg=bookclub",
     "list_selector": "body"

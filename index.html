@@ -6,228 +6,323 @@
 <title>教學醫院課程雷達</title>
 <style>
   :root {
-    --bg: #0b1220;
-    --panel: #121c30;
-    --line: #223256;
-    --text: #e7ecf7;
-    --muted: #8fa0c4;
-    --accent: #35e0a1;
-    --accent-dim: #1d8f68;
+    /* 60% ─ 主色：純淨白／極簡灰 */
+    --bg: #ffffff;
+    --bg-subtle: #f5f6f8;
+    --ink: #14181f;
+    --muted: #6b7280;
+    --divider: #eceef1;
+
+    /* 30% ─ 輔支色：沉穩醫學藍 */
+    --blue: #1f3a5f;
+    --blue-soft: #eaf0f7;
+
+    /* 10% ─ 點綴色：永續草綠（僅用於核心行動按鈕） */
+    --green: #2f8f5b;
+    --green-soft: #e6f4ec;
+    --green-press: #256e46;
+
+    --muted-soft: #f0f1f3;
+
+    --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", -apple-system, sans-serif;
     --mono: "SFMono-Regular", Consolas, "Noto Sans Mono TC", monospace;
-    --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+
+    --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
   }
+
+  [data-theme="dark"] {
+    --bg: #14171c;
+    --bg-subtle: #1b1f26;
+    --ink: #f2f4f7;
+    --muted: #9aa3b2;
+    --divider: #2a2e37;
+
+    --blue: #7fa8d4;
+    --blue-soft: #1c2a3c;
+
+    --green: #4cae7d;
+    --green-soft: #163326;
+    --green-press: #3c8f65;
+
+    --muted-soft: #20242c;
+  }
+
   * { box-sizing: border-box; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
   body {
     margin: 0;
-    background: radial-gradient(circle at 50% -10%, #14213c 0%, var(--bg) 55%);
-    color: var(--text);
+    background: var(--bg);
+    color: var(--ink);
     font-family: var(--sans);
-    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
   }
+
+  a { color: inherit; }
+
+  .shell {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
   header {
-    padding: 40px 24px 20px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 48px 0 28px;
+    gap: 16px;
   }
-  .radar {
-    width: 64px; height: 64px; margin: 0 auto 14px;
-    border-radius: 50%;
-    border: 1px solid var(--line);
-    position: relative;
-    background:
-      repeating-radial-gradient(circle, transparent 0 10px, var(--line) 10px 11px);
-  }
-  .radar::after {
-    content: "";
-    position: absolute; inset: 0;
-    border-radius: 50%;
-    background: conic-gradient(from 0deg, var(--accent) 0deg, transparent 55deg, transparent 360deg);
-    animation: sweep 3.2s linear infinite;
-    opacity: 0.85;
-  }
-  @keyframes sweep { to { transform: rotate(360deg); } }
-  h1 {
-    font-size: clamp(22px, 4vw, 32px);
-    letter-spacing: 0.02em;
+  .brand h1 {
+    font-size: clamp(22px, 4vw, 28px);
+    font-weight: 700;
     margin: 0 0 6px;
+    letter-spacing: -0.01em;
   }
-  header p { color: var(--muted); margin: 0; font-size: 14px; }
+  .brand p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .theme-toggle {
+    flex: 0 0 auto;
+    background: none;
+    border: 1px solid var(--divider);
+    color: var(--ink);
+    border-radius: 999px;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+  }
+  .theme-toggle:hover { background: var(--bg-subtle); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+  .notice {
+    padding: 16px 18px;
+    background: var(--blue-soft);
+    border-radius: 10px;
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+  .notice b { color: var(--blue); }
 
   .controls {
-    max-width: 900px;
-    margin: 0 auto 18px;
-    padding: 0 24px;
     display: flex;
-    gap: 10px;
+    gap: 14px;
+    margin-bottom: 8px;
     flex-wrap: wrap;
   }
-  .controls input, .controls select {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    color: var(--text);
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 14px;
+  .controls input,
+  .controls select {
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid var(--divider);
+    color: var(--ink);
     font-family: var(--sans);
+    font-size: 15px;
+    padding: 8px 2px;
+    border-radius: 0;
   }
-  .controls input { flex: 1 1 240px; }
-  .controls select { flex: 0 0 auto; }
-  .controls input:focus, .controls select:focus {
-    outline: none; border-color: var(--accent);
+  .controls input { flex: 1 1 260px; }
+  .controls select { flex: 0 0 auto; color: var(--muted); }
+  .controls input:focus,
+  .controls select:focus {
+    outline: none;
+    border-bottom-color: var(--blue);
   }
+  .controls input::placeholder { color: var(--muted); }
 
-  main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 24px 60px;
-  }
   .stat {
     color: var(--muted);
     font-family: var(--mono);
     font-size: 12px;
-    margin: 0 0 14px;
+    margin: 18px 0 6px;
   }
+
   ul.list { list-style: none; margin: 0; padding: 0; }
+
   li.item {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--divider);
+  }
+  li.item:last-child { border-bottom: none; }
+
+  .row-top {
     display: flex;
-    gap: 12px;
     align-items: baseline;
     justify-content: space-between;
-  }
-  li.item a {
-    color: var(--text);
-    text-decoration: none;
-    font-size: 15px;
-    line-height: 1.5;
-  }
-  li.item a:hover { color: var(--accent); text-decoration: underline; }
-  .meta {
-    flex: 0 0 auto;
-    text-align: right;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    white-space: nowrap;
-    padding-left: 10px;
+    gap: 12px;
+    margin-bottom: 6px;
   }
   .source-tag {
-    display: inline-block;
-    color: var(--accent);
-    margin-bottom: 3px;
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 600;
   }
-  .new-badge {
-    display: inline-block;
-    background: var(--accent-dim);
-    color: #d8fff0;
+  .date-tag {
     font-family: var(--mono);
-    font-size: 10px;
-    padding: 1px 6px;
-    border-radius: 4px;
-    margin-left: 6px;
-    vertical-align: middle;
+    font-size: 11.5px;
+    color: var(--muted);
+    white-space: nowrap;
   }
+
+  .title-link {
+    display: block;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.55;
+    text-decoration: none;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .title-link:hover { color: var(--blue); }
+  .title-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+  .tags-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .chip-new { background: var(--blue-soft); color: var(--blue); }
+  .chip-pending { background: var(--muted-soft); color: var(--muted); }
+  .chip-approved { background: var(--green-soft); color: var(--green); }
+  .chip-rejected { background: var(--muted-soft); color: var(--muted); text-decoration: line-through; }
+
+  /* 唯一保留動效的地方：核心行動按鈕（送出審查／填寫心得申請學分） */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.12s var(--ease), background-color 0.12s var(--ease), box-shadow 0.12s var(--ease);
+  }
+  .btn-primary:hover { box-shadow: 0 4px 14px rgba(47, 143, 91, 0.25); }
+  .btn-primary:active { transform: scale(0.96); background: var(--green-press); }
+  .btn-primary:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+
+  .count-note {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
   .empty {
     text-align: center;
     color: var(--muted);
-    padding: 60px 20px;
-    font-family: var(--mono);
-    font-size: 13px;
+    padding: 70px 20px;
+    font-size: 14px;
+    line-height: 1.8;
   }
-  .reflection-btn {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 4px 10px;
-    border: 1px solid var(--accent-dim);
-    color: var(--accent);
-    border-radius: 6px;
-    font-size: 12px;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .reflection-btn:hover {
-    background: var(--accent-dim);
-    color: #d8fff0;
-  }
-  .approved-badge {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 4px 10px;
-    background: rgba(53, 224, 161, 0.12);
-    border: 1px solid var(--accent-dim);
-    color: var(--accent);
-    border-radius: 6px;
-    font-size: 12px;
-    font-family: var(--mono);
-  }
+
   footer {
     text-align: center;
     color: var(--muted);
     font-size: 12px;
-    padding: 20px 24px 40px;
+    padding: 32px 24px 0;
   }
 </style>
 </head>
 <body>
-  <header>
-    <div class="radar"></div>
-    <h1>教學醫院課程雷達</h1>
-    <p>自動掃描各教學醫院／學會公告頁，彙整最新課程與工作坊</p>
-  </header>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <h1>教學醫院課程雷達</h1>
+        <p>自動掃描各教學醫院／學會公告頁，並手動收錄課程資訊</p>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="切換深色模式" title="切換深色模式">🌙</button>
+    </header>
 
-  <div class="controls">
-    <input id="search" type="text" placeholder="搜尋課程名稱…" />
-    <select id="sourceFilter">
-      <option value="">全部來源</option>
-    </select>
-  </div>
+    <div class="notice">
+      <b>學分認證須知：</b>僅「視訊課程」需要審核是否列入學分，實體課程請依原公告方式取得結業證明。
+      標示「已審核通過」的視訊課程可填寫心得申請學分；「審核中」代表尚未確認；「不列入」代表該課程不採計學分。
+    </div>
 
-  <main>
+    <div class="controls">
+      <input id="search" type="text" placeholder="搜尋課程名稱…" />
+      <select id="sourceFilter">
+        <option value="">全部來源</option>
+      </select>
+    </div>
+
     <p class="stat" id="stat"></p>
+
     <ul class="list" id="list"></ul>
+
     <div class="empty" id="empty" style="display:none">
       尚未抓到任何課程資料。<br />
       請確認 GitHub Actions 是否已成功執行過一次（Actions 分頁 → Scrape Courses → Run workflow）。
     </div>
-  </main>
 
-  <footer>
-    資料自動彙整自各機構公開公告頁，僅顯示標題與連結並導回原站，非官方彙整，實際資訊以原公告為準。
-  </footer>
+    <footer>
+      資料彙整自各機構公開公告頁與人工登錄，僅顯示標題與連結並導回原站，非官方彙整，實際資訊以原公告為準。
+    </footer>
+  </div>
 
 <script>
-  const state = { data: [], search: "", source: "", reflectionConfig: null, approvedCounts: {} };
+  const state = { data: [], search: "", source: "", config: null, approvedCounts: {} };
 
-  function needsReflection(item) {
-    const cfg = state.reflectionConfig;
-    if (!cfg) return false;
-    if (cfg.match_sources && cfg.match_sources.includes(item.source)) return true;
-    if (cfg.match_keywords) {
-      const title = item.title.toLowerCase();
-      return cfg.match_keywords.some(k => title.includes(k.toLowerCase()));
-    }
-    return false;
+  // ---- 深色模式：一鍵切換，記住偏好 ----
+  const root = document.documentElement;
+  const toggleBtn = document.getElementById("themeToggle");
+  function applyTheme(theme) {
+    root.setAttribute("data-theme", theme);
+    toggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
+  }
+  const savedTheme = localStorage.getItem("theme")
+    || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(savedTheme);
+  toggleBtn.addEventListener("click", () => {
+    const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    localStorage.setItem("theme", next);
+    applyTheme(next);
+  });
+
+  function daysAgo(iso) {
+    const then = new Date(iso).getTime();
+    const now = Date.now();
+    return Math.floor((now - then) / 86400000);
   }
 
-  // 如果有設定 course_name_entry_id，就把課程標題預先帶入表單的「課程名稱」欄位，
-  // 這樣學員填的課程名稱會跟網站上的標題完全一致，之後「已認列人數」才對得起來
   function buildFormUrl(item) {
-    const cfg = state.reflectionConfig;
+    const cfg = state.config;
     if (!cfg || !cfg.form_url) return "";
     if (!cfg.course_name_entry_id) return cfg.form_url;
     const sep = cfg.form_url.includes("?") ? "&" : "?";
     return `${cfg.form_url}${sep}usp=pp_url&entry.${cfg.course_name_entry_id}=${encodeURIComponent(item.title)}`;
   }
 
-  function daysAgo(iso) {
-    const then = new Date(iso).getTime();
-    const now = Date.now();
-    return Math.floor((now - then) / 86400000);
+  function statusChipHtml(item) {
+    if (!item.is_online) return "";
+    if (item.review_status === "通過") return '<span class="chip chip-approved">已審核通過</span>';
+    if (item.review_status === "不列入") return '<span class="chip chip-rejected">不列入學分</span>';
+    return '<span class="chip chip-pending">視訊課程審核中</span>';
   }
 
   function render() {
@@ -258,25 +353,30 @@
       const li = document.createElement("li");
       li.className = "item";
       const age = daysAgo(it.first_seen);
-      const badge = age <= 3 ? '<span class="new-badge">NEW</span>' : "";
-      let reflectionLink = "";
-      if (needsReflection(it)) {
+      const newChip = age <= 3 ? '<span class="chip chip-new">NEW</span>' : "";
+      const statusChip = statusChipHtml(it);
+
+      let actionHtml = "";
+      if (it.is_online && it.review_status === "通過") {
         const url = buildFormUrl(it);
         if (url) {
-          reflectionLink = `<br /><a class="reflection-btn" href="${url}" target="_blank" rel="noopener">📝 無法自動核發證明，上完課請填心得申請學分</a>`;
+          actionHtml += `<a class="btn-primary" href="${url}" target="_blank" rel="noopener">填寫心得申請學分</a>`;
         }
         const approved = state.approvedCounts[it.title];
         if (approved) {
-          reflectionLink += `<br /><span class="approved-badge">✅ 已有 ${approved} 人送出心得，學分認列中</span>`;
+          actionHtml += ` <span class="count-note">已有 ${approved} 人送出</span>`;
         }
       }
+
       li.innerHTML = `
-        <div>
-          <span class="source-tag">${it.source}</span>${badge}<br />
-          <a href="${it.url}" target="_blank" rel="noopener">${it.title}</a>
-          ${reflectionLink}
+        <div class="row-top">
+          <span class="source-tag">${it.source}</span>
+          <span class="date-tag">${it.first_seen.slice(0, 10)}</span>
         </div>
-        <div class="meta">首次發現<br />${it.first_seen.slice(0, 10)}</div>
+        <a class="title-link" href="${it.url}" target="_blank" rel="noopener">${it.title}</a>
+        <div class="tags-row">
+          ${newChip}${statusChip}${actionHtml}
+        </div>
       `;
       list.appendChild(li);
     }
@@ -305,16 +405,16 @@
   Promise.all([
     fetch("data/courses.json", { cache: "no-store" }).then(r => (r.ok ? r.json() : [])),
     fetch("data/manual-courses.json", { cache: "no-store" }).then(r => (r.ok ? r.json() : [])),
-    fetch("reflection-required.json", { cache: "no-store" }).then(r => (r.ok ? r.json() : null)),
+    fetch("config.json", { cache: "no-store" }).then(r => (r.ok ? r.json() : null)),
   ])
-    .then(([autoData, manualData, reflectionConfig]) => {
-      const merged = [...autoData, ...manualData.map(it => ({ ...it, last_seen: it.last_seen || it.first_seen }))];
+    .then(([autoData, manualData, config]) => {
+      const merged = [...autoData, ...manualData].reverse();
       state.data = merged.sort((a, b) => (a.first_seen < b.first_seen ? 1 : -1));
-      state.reflectionConfig = reflectionConfig;
+      state.config = config;
       populateSources();
 
-      if (reflectionConfig && reflectionConfig.status_api_url) {
-        fetch(reflectionConfig.status_api_url, { cache: "no-store" })
+      if (config && config.status_api_url) {
+        fetch(config.status_api_url, { cache: "no-store" })
           .then(r => (r.ok ? r.json() : []))
           .then(list => {
             state.approvedCounts = {};

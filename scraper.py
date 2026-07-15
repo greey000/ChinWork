@@ -2,15 +2,18 @@
 課程雷達 - 通用抓取腳本
 ------------------------------------
 設計原則：
-1. 不針對每個網站寫死複雜的版面解析規則（因為每家醫院/學會網頁結構都不同，
-   維護成本太高），而是抓取指定區塊內「所有連結的文字與網址」當作候選課程項目。
-2. 每次執行都會跟上一次抓到的資料比對，新出現的連結會被標記 first_seen（首次出現時間），
-   之前抓過的則更新 last_seen（最後仍在頁面上看到的時間）。
+1. 不針對每個網站寫死複雜的版面解析規則，而是抓取指定區塊內「所有連結的文字與網址」
+   當作候選課程項目。
+2. 每次執行都會跟上一次抓到的資料比對：
+   - 新出現的連結 → 新增一筆，標記 first_seen（首次出現時間），並用關鍵字猜測是否為
+     視訊課程（is_online），如果猜是視訊課程，review_status 預設為「待審核」
+   - 之前抓過的 → 只更新 title 和 last_seen，其他欄位（尤其 is_online、review_status，
+     這些通常是你手動審核調整過的）完全保留、不會被蓋掉
 3. 資料寫回 data/courses.json，交給 index.html 讀取顯示。
 
 如果某個來源抓不到東西，或抓到一堆雜訊（選單、頁尾連結），
 請調整 sources.json 裡該來源的 "list_selector"，改指到該頁面實際列出課程的
-容器（例如 "div.content" 或 "table"），做法見 README.md。
+容器（例如 "div.content" 或 "table"）。
 """
 
 import json
@@ -37,6 +40,12 @@ JUNK_KEYWORDS = [
     "聯絡我們", "english",
 ]
 
+# 用來猜測「是否為視訊課程」的關鍵字，猜錯了之後審核時可以手動改回來
+ONLINE_KEYWORDS = [
+    "線上", "线上", "視訊", "视讯", "zoom", "webinar", "遠距", "远距",
+    "數位課程", "数字课程", "meet.google", "teams", "書院", "on-line", "online",
+]
+
 
 def load_json(path, default):
     if path.exists():
@@ -53,6 +62,11 @@ def is_junk(text: str) -> bool:
         return True
     low = t.lower()
     return any(k in low for k in JUNK_KEYWORDS)
+
+
+def guess_is_online(source_name: str, title: str) -> bool:
+    text = (source_name + " " + title).lower()
+    return any(k.lower() in text for k in ONLINE_KEYWORDS)
 
 
 def scrape_source(source: dict) -> list[dict]:
@@ -82,7 +96,6 @@ def scrape_source(source: dict) -> list[dict]:
         full_url = urljoin(source["url"], href)
         items.append({"title": title, "url": full_url})
 
-    # 同一頁面內若有重複連結，去重
     seen = set()
     deduped = []
     for it in items:
@@ -113,11 +126,16 @@ def main():
                 record = existing_index[key]
                 record["title"] = it["title"]  # 標題可能有補上時間地點等更新
                 record["last_seen"] = now
+                # is_online / review_status 保留原值，不覆蓋（可能是你審核調整過的）
             else:
+                is_online = guess_is_online(source["name"], it["title"])
                 existing_index[key] = {
-                    "source": source["name"],
                     "title": it["title"],
+                    "source": source["name"],
                     "url": it["url"],
+                    "origin": "auto",
+                    "is_online": is_online,
+                    "review_status": "待審核" if is_online else "",
                     "first_seen": now,
                     "last_seen": now,
                 }
