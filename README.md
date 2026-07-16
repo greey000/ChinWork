@@ -129,6 +129,38 @@ Google 表單/試算表/Apps Script（免費自動化）組成。
 
 ---
 
+## 審核後台：用網頁介面審核學分、新增/編輯課程
+
+不用再手動編輯 JSON 檔案，`admin.html` 是一個網頁後台，透過 GitHub API 直接讀寫
+`data/courses.json` 和 `data/manual-courses.json`，可以：
+- 勾選課程是否為視訊課程、下拉選審核狀態（待審核／通過／不列入）
+- 新增、編輯、刪除手動課程
+- 修改自動抓取課程的標題/連結（例如標題有錯字）
+
+上傳到 repo 後，開啟 `https://你的帳號.github.io/repo名稱/admin.html` 就能用。
+
+### 申請一組專用的 GitHub Token（只做一次）
+
+1. GitHub 右上角頭像 → **Settings** → 左側最下方 **Developer settings**
+2. **Personal access tokens** → **Fine-grained tokens** → **Generate new token**
+3. Token name 隨意，例如「course-radar-admin」
+4. **Repository access** 選 **Only select repositories**，選你的課程雷達 repo
+5. **Permissions → Repository permissions → Contents** 選 **Read and write**
+6. 產生後複製這組 token（只會顯示一次，記得先存起來，例如存在密碼管理工具裡）
+
+> ⚠️ 這組 token 等於是你這個 repo 的鑰匙，**不要分享給別人、不要貼到其他網站**。
+> 只會在 `admin.html` 頁面裡使用，直接從你的瀏覽器打 GitHub API，不會經過我或任何第三方。
+> 如果不放心，可以設定 token 的到期日（例如 90 天），到期後再重新申請一組即可。
+
+### 使用方式
+
+1. 打開 `admin.html`，貼上 token，確認 Repo 擁有者/名稱/分支正確 → 「連接並載入課程」
+2. 預設會先顯示「待審核（視訊課程）」的清單，逐筆勾選/調整審核狀態
+3. 改完按「儲存變更」，會直接寫回 GitHub，網站等 GitHub Pages 重新部署（通常幾秒到 1 分鐘）後就會更新
+4. 「＋ 新增手動課程」可以直接在後台加課程，不用再去 GitHub 網頁編輯 JSON
+
+---
+
 ## 常見問題
 
 **Q: 某個來源抓到 0 筆，或抓到都是雜訊？**

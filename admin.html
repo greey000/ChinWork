@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>課程雷達 — 審核後台</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-subtle: #f5f6f8;
+    --ink: #14181f;
+    --muted: #6b7280;
+    --divider: #eceef1;
+    --blue: #1f3a5f;
+    --blue-soft: #eaf0f7;
+    --green: #2f8f5b;
+    --green-soft: #e6f4ec;
+    --green-press: #256e46;
+    --danger: #b3453f;
+    --danger-soft: #fbecea;
+    --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", -apple-system, sans-serif;
+    --mono: "SFMono-Regular", Consolas, "Noto Sans Mono TC", monospace;
+    --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  .shell { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+
+  .card {
+    background: var(--bg-subtle);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+  .card h2 { font-size: 15px; margin: 0 0 14px; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 5px; }
+  .field input, .field select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    padding: 9px 11px;
+    font-size: 14px;
+    color: var(--ink);
+    font-family: var(--sans);
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--blue); }
+  .field-row { display: flex; gap: 12px; }
+  .field-row .field { flex: 1; }
+
+  .note {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin: 0 0 16px;
+  }
+  .note b { color: var(--ink); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.12s var(--ease), box-shadow 0.12s var(--ease), background-color 0.12s var(--ease);
+  }
+  .btn-primary { background: var(--green); color: #fff; }
+  .btn-primary:hover { box-shadow: 0 4px 14px rgba(47,143,91,0.25); }
+  .btn-primary:active { transform: scale(0.96); background: var(--green-press); }
+  .btn-secondary { background: var(--bg); border: 1px solid var(--divider); color: var(--ink); }
+  .btn-secondary:hover { background: var(--bg-subtle); }
+  .btn-danger { background: var(--danger-soft); color: var(--danger); }
+  .btn-danger:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  #status {
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    display: none;
+  }
+  #status.ok { display: block; background: var(--green-soft); color: var(--green); }
+  #status.err { display: block; background: var(--danger-soft); color: var(--danger); }
+  #status.info { display: block; background: var(--blue-soft); color: var(--blue); }
+
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .toolbar select { border: 1px solid var(--divider); border-radius: 8px; padding: 8px 10px; font-family: var(--sans); font-size: 13.5px; color: var(--ink); background: var(--bg); }
+  .toolbar .spacer { flex: 1; }
+  .stat { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+  ul.rows { list-style: none; margin: 0; padding: 0; }
+  li.row {
+    border: 1px solid var(--divider);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .origin-tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--blue-soft);
+    color: var(--blue);
+  }
+  .row-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .row-grid .field-row { gap: 10px; }
+  .checkbox-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+  }
+  .checkbox-line input { width: auto; }
+  .row-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+
+  #connectPanel { max-width: 480px; }
+  #adminPanel { display: none; }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <h1>課程雷達 — 審核後台</h1>
+    <p class="subtitle">審核視訊課程學分、手動新增/編輯課程資訊，儲存後直接寫回 GitHub</p>
+
+    <div id="status"></div>
+
+    <div id="connectPanel" class="card">
+      <h2>連接你的 GitHub Repo</h2>
+      <p class="note">
+        Token 只會存在<b>你目前這個瀏覽器分頁</b>裡，直接從你的瀏覽器呼叫 GitHub API，
+        不會經過任何第三方。建議申請 <b>fine-grained token</b>，只勾選這一個 repo，
+        權限只給 <b>Contents: Read and write</b>。<br />
+        申請位置：GitHub 右上角頭像 → Settings → Developer settings → Personal access tokens →
+        Fine-grained tokens → Generate new token
+      </p>
+      <div class="field">
+        <label>GitHub Personal Access Token</label>
+        <input id="token" type="password" placeholder="ghp_ 或 github_pat_ 開頭的字串" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Repo 擁有者（帳號）</label>
+          <input id="owner" type="text" value="greey000" />
+        </div>
+        <div class="field">
+          <label>Repo 名稱</label>
+          <input id="repo" type="text" value="ChinWork" />
+        </div>
+      </div>
+      <div class="field">
+        <label>分支</label>
+        <input id="branch" type="text" value="main" />
+      </div>
+      <button class="btn btn-primary" id="connectBtn">連接並載入課程</button>
+    </div>
+
+    <div id="adminPanel">
+      <div class="toolbar">
+        <select id="filterSelect">
+          <option value="pending">待審核（視訊課程）</option>
+          <option value="all">全部課程</option>
+          <option value="approved">已通過</option>
+          <option value="rejected">不列入</option>
+          <option value="manual">手動新增</option>
+        </select>
+        <span class="stat" id="stat"></span>
+        <div class="spacer"></div>
+        <button class="btn btn-secondary" id="reloadBtn">重新載入</button>
+        <button class="btn btn-secondary" id="addManualBtn">＋ 新增手動課程</button>
+        <button class="btn btn-primary" id="saveBtn">儲存變更</button>
+      </div>
+
+      <ul class="rows" id="rows"></ul>
+    </div>
+  </div>
+
+<script>
+  const state = {
+    token: "", owner: "", repo: "", branch: "main",
+    autoList: [], autoSha: "",
+    manualList: [], manualSha: "",
+    filter: "pending",
+  };
+
+  function showStatus(msg, type) {
+    const el = document.getElementById("status");
+    el.textContent = msg;
+    el.className = type;
+  }
+
+  function utf8ToBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function base64ToUtf8(b64) {
+    return decodeURIComponent(escape(atob(b64.replace(/\n/g, ""))));
+  }
+
+  async function ghGet(path) {
+    const url = `https://api.github.com/repos/${state.owner}/${state.repo}/contents/${path}?ref=${state.branch}`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${state.token}`,
+        Accept: "application/vnd.github+json",
+      },
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`讀取 ${path} 失敗（${res.status}）：${body}`);
+    }
+    const data = await res.json();
+    return { json: JSON.parse(base64ToUtf8(data.content)), sha: data.sha };
+  }
+
+  async function ghPut(path, sha, obj, message) {
+    const url = `https://api.github.com/repos/${state.owner}/${state.repo}/contents/${path}`;
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${state.token}`,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message,
+        content: utf8ToBase64(JSON.stringify(obj, null, 2) + "\n"),
+        sha,
+        branch: state.branch,
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`寫入 ${path} 失敗（${res.status}）：${body}`);
+    }
+    return res.json();
+  }
+
+  async function loadAll() {
+    showStatus("載入中…", "info");
+    const [auto, manual] = await Promise.all([
+      ghGet("data/courses.json"),
+      ghGet("data/manual-courses.json"),
+    ]);
+    state.autoList = auto.json;
+    state.autoSha = auto.sha;
+    state.manualList = manual.json;
+    state.manualSha = manual.sha;
+    showStatus(`已載入：自動 ${state.autoList.length} 筆、手動 ${state.manualList.length} 筆`, "ok");
+    render();
+  }
+
+  function todayStr() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function matchesFilter(it) {
+    switch (state.filter) {
+      case "all": return true;
+      case "pending": return it.is_online && it.review_status === "待審核";
+      case "approved": return it.is_online && it.review_status === "通過";
+      case "rejected": return it.is_online && it.review_status === "不列入";
+      case "manual": return it.__origin === "manual";
+      default: return true;
+    }
+  }
+
+  function render() {
+    const rows = document.getElementById("rows");
+    rows.innerHTML = "";
+
+    const combined = [
+      ...state.autoList.map((it, i) => ({ ...it, __origin: "auto", __index: i })),
+      ...state.manualList.map((it, i) => ({ ...it, __origin: "manual", __index: i })),
+    ];
+    const filtered = combined.filter(matchesFilter);
+
+    document.getElementById("stat").textContent =
+      `共 ${combined.length} 筆・目前顯示 ${filtered.length} 筆`;
+
+    for (const it of filtered) {
+      const li = document.createElement("li");
+      li.className = "row";
+      const originLabel = it.__origin === "auto" ? "自動抓取" : "手動新增";
+
+      li.innerHTML = `
+        <div class="row-head">
+          <span class="origin-tag">${originLabel}</span>
+          <button class="btn btn-danger btn-delete" type="button">刪除</button>
+        </div>
+        <div class="row-grid">
+          <div class="field">
+            <label>課程名稱</label>
+            <input type="text" class="f-title" value="${escapeAttr(it.title || "")}" />
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>主辦單位</label>
+              <input type="text" class="f-source" value="${escapeAttr(it.source || "")}" />
+            </div>
+            <div class="field">
+              <label>首次發現日期</label>
+              <input type="text" class="f-date" value="${escapeAttr(it.first_seen || todayStr())}" />
+            </div>
+          </div>
+          <div class="field">
+            <label>連結</label>
+            <input type="text" class="f-url" value="${escapeAttr(it.url || "")}" />
+          </div>
+          <div class="field-row">
+            <div class="checkbox-line">
+              <input type="checkbox" class="f-online" ${it.is_online ? "checked" : ""} />
+              <label style="margin:0">視訊課程</label>
+            </div>
+            <div class="field" style="flex:1">
+              <label>審核狀態</label>
+              <select class="f-status">
+                <option value="" ${it.review_status === "" || !it.review_status ? "selected" : ""}>（不需審核）</option>
+                <option value="待審核" ${it.review_status === "待審核" ? "selected" : ""}>待審核</option>
+                <option value="通過" ${it.review_status === "通過" ? "selected" : ""}>通過</option>
+                <option value="不列入" ${it.review_status === "不列入" ? "selected" : ""}>不列入</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const origin = it.__origin;
+      const index = it.__index;
+      const list = origin === "auto" ? state.autoList : state.manualList;
+
+      li.querySelector(".f-title").addEventListener("input", e => { list[index].title = e.target.value; });
+      li.querySelector(".f-source").addEventListener("input", e => { list[index].source = e.target.value; });
+      li.querySelector(".f-date").addEventListener("input", e => { list[index].first_seen = e.target.value; });
+      li.querySelector(".f-url").addEventListener("input", e => { list[index].url = e.target.value; });
+      li.querySelector(".f-online").addEventListener("change", e => { list[index].is_online = e.target.checked; });
+      li.querySelector(".f-status").addEventListener("change", e => { list[index].review_status = e.target.value; });
+      li.querySelector(".btn-delete").addEventListener("click", () => {
+        if (!confirm("確定要刪除這筆課程嗎？（自動抓取的課程如果來源網頁上還存在，下次排程可能會重新出現）")) return;
+        list.splice(index, 1);
+        render();
+      });
+
+      rows.appendChild(li);
+    }
+  }
+
+  function escapeAttr(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  }
+
+  document.getElementById("connectBtn").addEventListener("click", async () => {
+    state.token = document.getElementById("token").value.trim();
+    state.owner = document.getElementById("owner").value.trim();
+    state.repo = document.getElementById("repo").value.trim();
+    state.branch = document.getElementById("branch").value.trim() || "main";
+
+    if (!state.token || !state.owner || !state.repo) {
+      showStatus("請把 Token、Repo 擁有者、Repo 名稱都填好", "err");
+      return;
+    }
+
+    try {
+      await loadAll();
+      document.getElementById("connectPanel").style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
+    } catch (err) {
+      showStatus(err.message, "err");
+    }
+  });
+
+  document.getElementById("reloadBtn").addEventListener("click", async () => {
+    try {
+      await loadAll();
+    } catch (err) {
+      showStatus(err.message, "err");
+    }
+  });
+
+  document.getElementById("filterSelect").addEventListener("change", e => {
+    state.filter = e.target.value;
+    render();
+  });
+
+  document.getElementById("addManualBtn").addEventListener("click", () => {
+    state.manualList.push({
+      title: "新課程（請填寫）",
+      source: "",
+      url: "",
+      origin: "manual",
+      is_online: false,
+      review_status: "",
+      first_seen: todayStr(),
+    });
+    state.filter = "manual";
+    document.getElementById("filterSelect").value = "manual";
+    render();
+  });
+
+  document.getElementById("saveBtn").addEventListener("click", async () => {
+    const btn = document.getElementById("saveBtn");
+    btn.disabled = true;
+    showStatus("儲存中…", "info");
+    try {
+      const autoResult = await ghPut(
+        "data/courses.json",
+        state.autoSha,
+        state.autoList,
+        "後台更新：自動課程審核狀態"
+      );
+      state.autoSha = autoResult.content.sha;
+
+      const manualResult = await ghPut(
+        "data/manual-courses.json",
+        state.manualSha,
+        state.manualList,
+        "後台更新：手動課程資料"
+      );
+      state.manualSha = manualResult.content.sha;
+
+      showStatus("已儲存，網站幾秒後就會更新（GitHub Pages 需要一點時間重新部署）", "ok");
+    } catch (err) {
+      showStatus(err.message + "（如果是 409 衝突，請按「重新載入」再試一次）", "err");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
