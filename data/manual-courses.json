@@ -9,21 +9,21 @@
     "first_seen": "2026-07-15"
   },
   {
-    "title": "範例：視訊課程需要審核（請刪除或修改這筆）",
-    "source": "課程主辦單位名稱",
-    "url": "https://example.com/視訊課程連結",
-    "origin": "manual",
-    "is_online": true,
-    "review_status": "不列入",
-    "first_seen": "2026-07-15"
-  },
-  {
-    "title": "新課程（請填寫）",
-    "source": "",
-    "url": "",
+    "title": "訓練計畫評估工作坊",
+    "source": "台北慈濟醫院教學部",
+    "url": "https://forms.gle/BrdGYYUbXiPT52c6A",
     "origin": "manual",
     "is_online": false,
-    "review_status": "",
+    "review_status": "通過",
+    "first_seen": "2026-07-17"
+  },
+  {
+    "title": " 未來醫學教育研討會",
+    "source": "臺北醫學大學附設醫院",
+    "url": "https://cbme.lib.cmuh.org.tw/p/AUG08-2026",
+    "origin": "manual",
+    "is_online": false,
+    "review_status": "通過",
     "first_seen": "2026-07-17"
   }
 ]
