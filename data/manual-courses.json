@@ -5,7 +5,7 @@
     "url": "https://example.com/課程網頁連結或PDF連結",
     "origin": "manual",
     "is_online": false,
-    "review_status": "",
+    "review_status": "不列入",
     "first_seen": "2026-07-15"
   },
   {
@@ -14,7 +14,7 @@
     "url": "https://example.com/視訊課程連結",
     "origin": "manual",
     "is_online": true,
-    "review_status": "待審核",
+    "review_status": "不列入",
     "first_seen": "2026-07-15"
   }
 ]
