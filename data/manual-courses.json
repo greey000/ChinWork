@@ -1,11 +1,11 @@
 [
   {
-    "title": "範例：114年度XX研習會（請刪除或修改這筆）",
-    "source": "課程主辦單位名稱",
-    "url": "https://example.com/課程網頁連結或PDF連結",
+    "title": "2026年台北慈濟醫院醫學教育國際研討會",
+    "source": "台北慈濟醫院教學部",
+    "url": "https://taipei.tzuchi.com.tw/2026%e5%b9%b4%e5%8f%b0%e5%8c%97%e6%85%88%e6%bf%9f%e9%86%ab%e9%99%a2%e9%86%ab%e5%ad%b8%e6%95%99%e8%82%b2%e5%9c%8b%e9%9a%9b%e7%a0%94%e8%a8%8e%e6%9c%83/",
     "origin": "manual",
     "is_online": false,
-    "review_status": "不列入",
+    "review_status": "通過",
     "first_seen": "2026-07-15"
   },
   {
@@ -16,5 +16,14 @@
     "is_online": true,
     "review_status": "不列入",
     "first_seen": "2026-07-15"
+  },
+  {
+    "title": "新課程（請填寫）",
+    "source": "",
+    "url": "",
+    "origin": "manual",
+    "is_online": false,
+    "review_status": "",
+    "first_seen": "2026-07-17"
   }
 ]
